@@ -14,29 +14,124 @@ import java.net.InetAddress;
  * @author debian
  */
 public class Material {
+    
+    static int gruen = 10;
+    static int rot = 10;
+    static int gelb = 10;
+    
     public static void main(String args[]) throws Exception {
-        DatagramSocket serverSocket = new DatagramSocket(9877);
-        byte[] receiveData = new byte[1024];
-        byte[] sendData = new byte[1024];
+        DatagramSocket serverSocket = new DatagramSocket(9999);
+        byte[] receiveData;
+        byte[] sendData;
         boolean exit = false;
+        String buffer;
+        InetAddress IPAddress;
+        int port;
+        
+        System.out.println("Materiallager gestartet ...");
+        
         while(exit == false) {
+            receiveData = new byte[1024];
+            sendData = new byte[1024];
+            
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             serverSocket.receive(receivePacket);
-            String fromPanel = new String( receivePacket.getData());
-            System.out.println("RECEIVED: " + fromPanel);
-            InetAddress IPAddress = receivePacket.getAddress();
-            int port = receivePacket.getPort();
-            String toPanel = fromPanel.toUpperCase();
-            sendData = toPanel.getBytes();
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
-            serverSocket.send(sendPacket);
+            
+            buffer = new String( receivePacket.getData());
+            String [] parameter = buffer.split(",");
+            /*
+            [0] CurrentTimeMillis
+            [1] Befehl
+            [2] Farbe
+            */
+//            System.out.println("RECEIVED: ");
+//            for (int tmp = 0; tmp < parameter.length; tmp++) {
+//                System.out.println("[" + tmp + "]" + parameter[tmp]);
+//            }
+            
+            if (parameter[1].equals("exit")) {
+                exit = true;
+            }
+            else if (parameter[1].equals("refill")) {
+                long ping = System.currentTimeMillis() - Long.parseLong(parameter[0]);
+                System.out.println("Panel -> Lager: " + ping + "ms");
+                IPAddress = receivePacket.getAddress();
+                port = receivePacket.getPort();
+                
+                if (parameter[2].equals("gruen")) {
+                    gruen = 10;
+                }
+                else if (parameter[2].equals("rot")) {
+                    rot = 10;
+                }
+                else if (parameter[2].equals("gelb")) {
+                    gelb = 10;
+                }
+                
+                /*
+                Antwort benoetigt?
+                */
+//                buffer = System.currentTimeMillis() + "," + "refilled" + "," + parameter[2] + ",";
+//                sendData = buffer.getBytes();
+//                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+//                serverSocket.send(sendPacket);
+            }
+            else if (parameter[1].equals("decrease")) {
+                long ping = System.currentTimeMillis() - Long.parseLong(parameter[0]);
+                System.out.println("Druckkopf -> Lager: " + ping + "ms");
+                IPAddress = InetAddress.getByName("localhost");
+                port = 9997;
+                String tmp = "";
+                
+                if (parameter[2].equals("gruen")) {
+                    gruen --;
+                    if (gruen == 0) {
+                        tmp = "empty" + "," + "gruen";
+                    }
+                    else {
+                        tmp = "success";
+                    }
+                }
+                else if (parameter[2].equals("rot")) {
+                    rot --;
+                    if (rot == 0) {
+                        tmp = "empty" + "," + "rot";
+                    }
+                    else {
+                        tmp = "success";
+                    }
+                }
+                else if (parameter[2].equals("gelb")) {
+                    gelb --;
+                    if (gelb == 0) {
+                        tmp = "empty" + "," + "gelb";
+                    }
+                    else {
+                        tmp = "success";
+                    }
+                }
+                
+                buffer = System.currentTimeMillis() + "," + tmp + ",";
+                sendData = buffer.getBytes();
+                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+                serverSocket.send(sendPacket);
+//                System.out.println("send: " + buffer);
+            }
+            else if (parameter[1].equals("check")) {
+                long ping = System.currentTimeMillis() - Long.parseLong(parameter[0]);
+                System.out.println("Panel -> Lager: " + ping + "ms");
+                IPAddress = receivePacket.getAddress();
+                port = receivePacket.getPort();
+                buffer = System.currentTimeMillis() + "," + gruen + "," + rot + "," + gelb + ",";
+                sendData = buffer.getBytes();
+                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+                serverSocket.send(sendPacket);
+//                System.out.println("send: " + buffer);
+            }
         }
     }
 }
 
-//    static int gruen = 10;
-//    static int rot = 10;
-//    static int gelb = 10;
 //    
 //    static Socket panelSocket = null;
 //    /**
