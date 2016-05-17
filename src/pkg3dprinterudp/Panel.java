@@ -157,8 +157,9 @@ public class Panel {
     
     public static void userError (String error, String loesung) {
         try {
-            System.out.println("\n\tERROR:\t" + error);
-            System.out.println("\t" + loesung);
+            System.out.println("-------------------------------------------------------------------------------");
+            System.out.println("\tERROR:\t" + error);
+            System.out.println("\t" + loesung + "\n");
             
             BufferedReader reader = new BufferedReader (new InputStreamReader (System.in));
             String input = reader.readLine();

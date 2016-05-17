@@ -55,8 +55,8 @@ public class Material {
             else if (parameter[1].equals("refill")) {
                 long ping = System.currentTimeMillis() - Long.parseLong(parameter[0]);
                 System.out.println("Panel -> Lager: " + ping + "ms");
-                IPAddress = receivePacket.getAddress();
-                port = receivePacket.getPort();
+//                IPAddress = receivePacket.getAddress();
+//                port = receivePacket.getPort();
                 
                 if (parameter[2].equals("gruen")) {
                     gruen = 10;
